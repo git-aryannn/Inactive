@@ -1,0 +1,38 @@
+[package]
+name = "signaling-server"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "signaling-server"
+path = "src/main.rs"
+
+[dependencies]
+tokio = { workspace = true }
+axum = { workspace = true }
+tower = { workspace = true }
+tower-http = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+anyhow = { workspace = true }
+
+# WebSocket support
+tokio-tungstenite = "0.24"
+futures-util = "0.3"
+
+# TLS
+axum-server = { version = "0.7", features = ["tls-rustls"] }
+rustls = { workspace = true }
+rustls-pemfile = "2"
+
+# UUID for session IDs
+uuid = { version = "1", features = ["v4"] }
+
+# Time
+chrono = { version = "0.4", features = ["serde"] }
+
+# Rate limiting
+tower_governor = "0.4"
+

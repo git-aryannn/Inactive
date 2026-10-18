@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+    "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+    macOS LaunchDaemon plist
+    Install to: /Library/LaunchDaemons/com.remotedesk.agent.plist
+    Load with: sudo launchctl load /Library/LaunchDaemons/com.remotedesk.agent.plist
+
+    WHY LaunchDaemon (not LaunchAgent)?
+    - Runs at ROOT level (not user level)
+    - Starts BEFORE any user logs in
+    - Cannot be stopped by regular user or third-party apps
+    - Survives logout — restarts automatically
+    - Third-party antivirus/security tools cannot terminate it without root
+-->
+<plist version="1.0">
+<dict>
+    <!-- Unique identifier for this daemon -->
+    <key>Label</key>
+    <string>com.remotedesk.agent</string>
+
+    <!-- Binary to run -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/local/bin/remote-desk-agent</string>
+        <string>--daemon</string>
+    </array>
+
+    <!-- Start at system boot, before any user login -->
+    <key>RunAtLoad</key>
+    <true/>
+
+    <!-- Auto-restart if it crashes -->
+    <key>KeepAlive</key>
+    <true/>
+
+    <!-- Run as root (required for LaunchDaemon) -->
+    <key>UserName</key>
+    <string>root</string>
+
+    <!-- Log stdout to file -->
+    <key>StandardOutPath</key>
+    <string>/var/log/remote-desk-agent.log</string>
+
+    <!-- Log stderr to file -->
+    <key>StandardErrorPath</key>
+    <string>/var/log/remote-desk-agent-error.log</string>
+
+    <!-- Environment variables -->
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>RUST_LOG</key>
+        <string>host_agent=info</string>
+    </dict>
+
+    <!-- Throttle restart — wait 10s before restarting after crash -->
+    <key>ThrottleInterval</key>
+    <integer>10</integer>
+</dict>
+</plist>
+

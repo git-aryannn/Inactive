@@ -1,0 +1,46 @@
+[package]
+name = "remote-desktop-core"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+# Async
+tokio = { workspace = true }
+
+# QUIC P2P Transport
+quinn = { workspace = true }
+rustls = { workspace = true }
+rustls-pemfile = "2"
+rcgen = "0.13"  # Self-signed cert generation for QUIC
+
+# Cryptography (E2EE)
+x25519-dalek = { workspace = true }
+chacha20poly1305 = { workspace = true }
+rand = { workspace = true }
+sha2 = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+bincode = { workspace = true }
+
+# Networking
+bytes = "1"
+futures = "0.3"
+
+# Logging
+tracing = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+
+[target.'cfg(target_os = "windows")'.dependencies]
+# Windows screen capture via DXGI Desktop Duplication
+windows-capture = "1"
+# Windows input simulation
+enigo = { version = "0.2", features = [] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+# macOS screen capture (ScreenCaptureKit wrapper)
+scap = "0.1.0-beta.1"
+# macOS input simulation
+enigo = { version = "0.2", features = [] }
