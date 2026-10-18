@@ -49,3 +49,4 @@ pub fn run_service(_args: Vec<OsString>) -> Result<()> {
 
     Ok(())
 }
+
