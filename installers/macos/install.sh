@@ -24,15 +24,25 @@ mkdir -p "${LOG_DIR}"
 chmod 755 "${LOG_DIR}"
 
 # If prebuilt binary exists, install it
-if [ -f "$(dirname "$0")/../../target/release/host-agent" ]; then
-  echo "2. Copying release binary to ${INSTALL_BIN_DIR}/${BINARY_NAME}..."
-  cp "$(dirname "$0")/../../target/release/host-agent" "${INSTALL_BIN_DIR}/${BINARY_NAME}"
-elif [ -f "$(dirname "$0")/../../target/debug/host-agent" ]; then
-  echo "2. Copying debug binary to ${INSTALL_BIN_DIR}/${BINARY_NAME}..."
-  cp "$(dirname "$0")/../../target/debug/host-agent" "${INSTALL_BIN_DIR}/${BINARY_NAME}"
+SRC_BIN=""
+for candidate in \
+  "$(dirname "$0")/../../target/release/inactive-agent" \
+  "$(dirname "$0")/../../target/release/host-agent" \
+  "$(dirname "$0")/../../target/debug/inactive-agent" \
+  "$(dirname "$0")/../../target/debug/host-agent"; do
+  if [ -f "$candidate" ]; then
+    SRC_BIN="$candidate"
+    break
+  fi
+done
+
+if [ -n "$SRC_BIN" ]; then
+  echo "2. Copying binary from ${SRC_BIN} to ${INSTALL_BIN_DIR}/${BINARY_NAME}..."
+  cp "${SRC_BIN}" "${INSTALL_BIN_DIR}/${BINARY_NAME}"
 else
-  echo "⚠️ Binary not found. Building host-agent..."
+  echo "⚠️ Binary not found. Building inactive-agent..."
   cargo build --release --package host-agent
+  cp "$(dirname "$0")/../../target/release/inactive-agent" "${INSTALL_BIN_DIR}/${BINARY_NAME}" 2>/dev/null || \
   cp "$(dirname "$0")/../../target/release/host-agent" "${INSTALL_BIN_DIR}/${BINARY_NAME}"
 fi
 

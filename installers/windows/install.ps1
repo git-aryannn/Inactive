@@ -16,12 +16,19 @@ Write-Host "1. Creating installation directory..."
 New-Item -ItemType Directory -Force -Path $InstallDir | Out-Null
 
 # 2. Copy binary
-$SourceBin = "$PSScriptRoot\..\..\target\release\host-agent.exe"
+$SourceBin = "$PSScriptRoot\..\..\target\release\inactive-agent.exe"
+if (-not (Test-Path $SourceBin)) {
+    $SourceBin = "$PSScriptRoot\..\..\target\release\host-agent.exe"
+}
+if (-not (Test-Path $SourceBin)) {
+    $SourceBin = "$PSScriptRoot\..\..\target\debug\inactive-agent.exe"
+}
+
 if (Test-Path $SourceBin) {
-    Write-Host "2. Copying binary..."
+    Write-Host "2. Copying binary from $SourceBin..."
     Copy-Item $SourceBin -Destination $BinaryPath -Force
 } else {
-    Write-Warning "Binary not found at $SourceBin. Please compile first: cargo build --release -p host-agent"
+    Write-Warning "Binary not found. Please compile first: cargo build --release -p host-agent"
 }
 
 # 3. Stop and remove existing service if present
