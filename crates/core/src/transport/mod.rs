@@ -96,7 +96,7 @@ impl QuicPeer {
 
         let connection = self
             .endpoint
-            .connect_with(client_config, peer_addr, "remote-desktop")?
+            .connect_with(client_config, peer_addr, "inactive")?
             .await
             .context("Failed to connect to peer")?;
 
@@ -164,7 +164,7 @@ impl QuicPeer {
 /// Generate self-signed TLS certificate for QUIC
 /// (E2EE key verification done at application layer, not TLS layer)
 fn generate_self_signed_cert() -> Result<(rustls::pki_types::CertificateDer<'static>, rustls::pki_types::PrivateKeyDer<'static>)> {
-    let cert = rcgen::generate_simple_self_signed(vec!["remote-desktop".to_string()])
+    let cert = rcgen::generate_simple_self_signed(vec!["inactive".to_string()])
         .context("Failed to generate self-signed certificate")?;
 
     let cert_der = rustls::pki_types::CertificateDer::from(cert.cert);

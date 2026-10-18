@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# macOS Installation Script for Remote Desk Host Agent
+# macOS Installation Script for Inactive Host Agent
 # Runs as LaunchDaemon (Root level, persists across logouts, protected from termination)
 
 set -e
 
-echo "=== Remote Desk Agent — macOS Installer ==="
+echo "=== Inactive Agent — macOS Installer ==="
 
 # Check root permissions
 if [ "$EUID" -ne 0 ]; then
@@ -12,12 +12,12 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
-BINARY_NAME="remote-desk-agent"
+BINARY_NAME="inactive-agent"
 INSTALL_BIN_DIR="/usr/local/bin"
-PLIST_NAME="com.remotedesk.agent.plist"
-PLIST_SRC="$(dirname "$0")/com.remotedesk.agent.plist"
+PLIST_NAME="com.inactive.agent.plist"
+PLIST_SRC="$(dirname "$0")/com.inactive.agent.plist"
 PLIST_DEST="/Library/LaunchDaemons/${PLIST_NAME}"
-LOG_DIR="/var/log/remote-desktop"
+LOG_DIR="/var/log/inactive"
 
 echo "1. Creating log directory ${LOG_DIR}..."
 mkdir -p "${LOG_DIR}"
@@ -49,7 +49,6 @@ launchctl unload "${PLIST_DEST}" 2>/dev/null || true
 echo "5. Loading LaunchDaemon..."
 launchctl load -w "${PLIST_DEST}"
 
-echo "✅ Remote Desk Agent successfully installed and running!"
-echo "   - Status check: sudo launchctl list | grep remotedesk"
-echo "   - View logs:    tail -f ${LOG_DIR}/remote-desk-agent.log"
-
+echo "✅ Inactive Agent successfully installed and running!"
+echo "   - Status check: sudo launchctl list | grep inactive"
+echo "   - View logs:    tail -f ${LOG_DIR}/inactive-agent.log"

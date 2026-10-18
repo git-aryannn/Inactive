@@ -1,15 +1,15 @@
-# Windows PowerShell Installation Script for Remote Desk Host Agent
+# Windows PowerShell Installation Script for Inactive Host Agent
 # Registers host-agent as a SYSTEM-level Windows Service with Firewall rule
 
 #Requires -RunAsAdministrator
 
-Write-Host "=== Remote Desk Agent — Windows Service Installer ===" -ForegroundColor Cyan
+Write-Host "=== Inactive Agent — Windows Service Installer ===" -ForegroundColor Cyan
 
-$ServiceName = "RemoteDesktopAgent"
-$DisplayName = "Remote Desktop Host Service"
-$Description = "High-performance encrypted remote desktop host service."
-$InstallDir = "C:\Program Files\RemoteDesk"
-$BinaryPath = "$InstallDir\host-agent.exe"
+$ServiceName = "InactiveAgent"
+$DisplayName = "Inactive Host Service"
+$Description = "Inactive - High-performance encrypted remote desktop host service."
+$InstallDir = "C:\Program Files\Inactive"
+$BinaryPath = "$InstallDir\inactive-agent.exe"
 
 # 1. Create directory
 Write-Host "1. Creating installation directory..."
@@ -42,14 +42,14 @@ New-Service -Name $ServiceName `
 
 # 5. Add Windows Firewall Rule for QUIC/UDP and HTTPS/TCP
 Write-Host "5. Configuring Windows Firewall..."
-New-NetFirewallRule -DisplayName "RemoteDesk Agent Inbound UDP" `
+New-NetFirewallRule -DisplayName "Inactive Agent Inbound UDP" `
     -Direction Inbound `
     -Action Allow `
     -Protocol UDP `
     -Program $BinaryPath `
     -ErrorAction SilentlyContinue | Out-Null
 
-New-NetFirewallRule -DisplayName "RemoteDesk Agent Inbound TCP" `
+New-NetFirewallRule -DisplayName "Inactive Agent Inbound TCP" `
     -Direction Inbound `
     -Action Allow `
     -Protocol TCP `
@@ -60,7 +60,6 @@ New-NetFirewallRule -DisplayName "RemoteDesk Agent Inbound TCP" `
 Write-Host "6. Starting service..."
 Start-Service -Name $ServiceName
 
-Write-Host "✅ Remote Desk Service installed and started successfully!" -ForegroundColor Green
+Write-Host "✅ Inactive Service installed and started successfully!" -ForegroundColor Green
 Write-Host "   Service Status: " -NoNewline
 (Get-Service -Name $ServiceName).Status
-

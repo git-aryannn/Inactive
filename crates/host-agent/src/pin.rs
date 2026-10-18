@@ -123,7 +123,7 @@ impl PinManager {
     fn get_config_path() -> PathBuf {
         let base_dir = dirs::config_dir()
             .unwrap_or_else(|| PathBuf::from("."))
-            .join("RemoteDesk");
+            .join("Inactive");
         base_dir.join("device_pin.json")
     }
 }

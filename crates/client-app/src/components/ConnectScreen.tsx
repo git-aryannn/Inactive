@@ -16,7 +16,7 @@ interface Props {
 export function ConnectScreen({ state, onConnect, onConnected, onError }: Props) {
   const [digits, setDigits] = useState<string[]>(() => {
     try {
-      const saved = localStorage.getItem("remotedesk_last_pin");
+      const saved = localStorage.getItem("inactive_last_pin");
       if (saved && saved.length === 9) {
         return saved.split("");
       }
@@ -85,7 +85,7 @@ export function ConnectScreen({ state, onConnect, onConnected, onError }: Props)
   const handleConnect = async () => {
     if (!isComplete) return;
     try {
-      localStorage.setItem("remotedesk_last_pin", pin);
+      localStorage.setItem("inactive_last_pin", pin);
     } catch (_) {}
     onConnect(pin);
     try {
@@ -100,7 +100,7 @@ export function ConnectScreen({ state, onConnect, onConnected, onError }: Props)
       {/* Logo / Title */}
       <div className="text-center">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-          Remote Desk
+          Inactive
         </h1>
         <p className="text-gray-400 mt-2">Enter the 9-digit PIN from the host computer</p>
       </div>
@@ -169,7 +169,7 @@ export function ConnectScreen({ state, onConnect, onConnected, onError }: Props)
 
       {/* Help text */}
       <p className="text-gray-600 text-sm text-center max-w-sm">
-        Make sure the Remote Desk agent is running on the host machine and
+        Make sure the Inactive agent is running on the host machine and
         share the PIN shown there.
       </p>
     </div>

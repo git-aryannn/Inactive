@@ -46,7 +46,7 @@ impl E2EESession {
         // Derive a 256-bit key from the shared secret using SHA-256
         let mut hasher = Sha256::new();
         hasher.update(shared_secret.as_bytes());
-        hasher.update(b"remote-desktop-v1"); // domain separation
+        hasher.update(b"inactive-v1"); // domain separation
         let key_bytes = hasher.finalize();
 
         let key = Key::from_slice(&key_bytes);

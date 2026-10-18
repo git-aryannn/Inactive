@@ -1,4 +1,4 @@
-# Remote Desk — Ultra Low-Latency Encrypted Remote Desktop
+# Inactive — Ultra Low-Latency Encrypted Remote Desktop
 
 An enterprise-grade, high-performance, self-hosted remote desktop software built in **Rust** and **Tauri**. Designed for cross-network operations (LAN + WAN / Global Internet) with direct P2P streaming, End-to-End Encryption (E2EE), and resilient system-service operation.
 
@@ -11,8 +11,8 @@ An enterprise-grade, high-performance, self-hosted remote desktop software built
 - **Port 443 / HTTPS Compliant:** Traffic travels through port 443, making it indistinguishable from standard secure web traffic to pass restrictive firewalls.
 - **End-to-End Encrypted (E2EE):** Per-session X25519 ECDH key exchange with ChaCha20-Poly1305 authenticated encryption. Even the cloud server cannot inspect screen frames or keystrokes.
 - **Tamper & Termination Resistant:**
-  - **Windows:** Runs as a native `SYSTEM`-level Windows Service (`RemoteDesktopAgent`). Protected from unauthorized termination by third-party tools.
-  - **macOS:** Runs as a root `LaunchDaemon` (`/Library/LaunchDaemons/com.remotedesk.agent.plist`), surviving user logouts and automatically restarting upon crashes.
+  - **Windows:** Runs as a native `SYSTEM`-level Windows Service (`InactiveAgent`). Protected from unauthorized termination by third-party tools.
+  - **macOS:** Runs as a root `LaunchDaemon` (`/Library/LaunchDaemons/com.inactive.agent.plist`), surviving user logouts and automatically restarting upon crashes.
 - **Durable & Persistent 9-Digit PIN:** Saved persistently to disk (`device_pin.json`). Does not expire or rotate on disconnections. Allows infinite seamless reconnects without needing a new PIN.
 - **Hardware-Accelerated Screen Capture:**
   - Windows: DXGI Desktop Duplication API (60fps, low CPU overhead).
@@ -46,7 +46,6 @@ An enterprise-grade, high-performance, self-hosted remote desktop software built
 ## 📂 Project Structure
 
 ```
-remote-desktop/
 ├── Cargo.toml                      # Root Cargo workspace
 ├── docker-compose.yml              # Cloud deployment (Signaling + coturn)
 ├── docker/
@@ -63,12 +62,12 @@ remote-desktop/
 │   │   ├── src/service_windows.rs  # Windows Service wrapper
 │   │   ├── src/agent.rs            # Signaling loop & notifications
 │   │   ├── src/session.rs          # Streaming & input worker tasks
-│   │   └── src/pin.rs              # 9-digit PIN lifecycle management
+│   │   └── src/pin.rs              # Durable 9-digit PIN management
 │   ├── signaling-server/           # Cloud rendezvous server
 │   │   ├── src/registry.rs         # In-memory session & PIN broker
 │   │   ├── src/stun.rs             # STUN server implementation
 │   │   └── src/relay.rs            # TURN relay fallback
-│   └── client-app/                 # Tauri 2.0 Client UI
+│   └── client-app/                 # Tauri 2.0 Client UI (Inactive)
 │       ├── src/                    # React 18 + TailwindCSS frontend
 │       │   ├── components/ConnectScreen.tsx  # PIN Entry
 │       │   ├── components/RemoteView.tsx     # Low-latency canvas renderer
@@ -89,21 +88,19 @@ remote-desktop/
 
 ### 2. Run Signaling Server (Local or Cloud)
 ```bash
-cd remote-desktop
 cargo run --package signaling-server
 # Server listens on 0.0.0.0:8080 (or port 443 with TLS)
 ```
 
 ### 3. Run Host Agent (Host Computer)
 ```bash
-cd remote-desktop
 cargo run --package host-agent
-# Agent outputs your 9-digit PIN and connects to signaling server
+# Agent outputs your durable 9-digit PIN and connects to signaling server
 ```
 
 ### 4. Run Client App (Controller Computer)
 ```bash
-cd remote-desktop/crates/client-app
+cd crates/client-app
 npm install
 npm run tauri dev
 # Enter host's 9-digit PIN in the UI to connect!
@@ -116,11 +113,10 @@ npm run tauri dev
 Deploy the signaling server and TURN relay on your VPS:
 
 ```bash
-cd remote-desktop
 docker compose up -d
 ```
 
-Ensure DNS records point your domain (e.g. `desk.yourdomain.com`) to your server IP, and configure Let's Encrypt certificates in `./certs/`.
+Ensure DNS records point your domain (e.g. `inactive.yourdomain.com`) to your server IP, and configure Let's Encrypt certificates in `./certs/`.
 
 ---
 
@@ -129,4 +125,3 @@ Ensure DNS records point your domain (e.g. `desk.yourdomain.com`) to your server
 - **Forward Secrecy:** Every connection generates an ephemeral ECDH keypair.
 - **Zero-Knowledge Cloud:** The signaling server never receives session decryption keys.
 - **Payload Authentication:** ChaCha20-Poly1305 provides AEAD verification against data tampering or injection.
-

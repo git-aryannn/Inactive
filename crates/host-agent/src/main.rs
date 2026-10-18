@@ -41,13 +41,13 @@ fn windows_service_main(args: Vec<std::ffi::OsString>) {
 async fn main() -> Result<()> {
     // Initialize logging
     // On Windows: log to Windows Event Log
-    // On macOS: log to /var/log/remote-desktop-agent.log
+    // On macOS: log to /var/log/inactive/inactive-agent.log
     let log_dir = if cfg!(target_os = "macos") {
-        "/var/log/remote-desktop".to_string()
+        "/var/log/inactive".to_string()
     } else {
         dirs::data_dir()
             .unwrap_or_default()
-            .join("RemoteDesktop")
+            .join("Inactive")
             .join("logs")
             .to_string_lossy()
             .to_string()
@@ -66,12 +66,12 @@ async fn main() -> Result<()> {
     #[cfg(target_os = "windows")]
     {
         if std::env::args().any(|a| a == "--service") {
-            return service_dispatcher::start("RemoteDesktopAgent", ffi_service_main)
+            return service_dispatcher::start("InactiveAgent", ffi_service_main)
                 .map_err(|e| anyhow::anyhow!("Service dispatch failed: {}", e));
         }
     }
 
-    info!("Remote Desktop Host Agent starting...");
+    info!("Inactive Host Agent starting...");
 
     // Run the main agent loop
     agent::run().await

@@ -20,7 +20,7 @@ pub async fn run() -> Result<()> {
 
     // Show PIN to user via system notification on agent startup
     show_notification(
-        "Remote Desktop",
+        "Inactive",
         &format!("Device PIN: {} (Ready for connection)", pin),
     );
 
