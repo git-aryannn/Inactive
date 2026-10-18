@@ -33,21 +33,38 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin' || '' }}
 
       - name: Install Frontend Dependencies
         working-directory: crates/client-app
         run: npm install
 
-      - name: Build Tauri App & Host Agent
+      - name: Build Host Agent Binary
+        run: cargo build --release --package host-agent
+
+      - name: Build Tauri Client App
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           projectPath: crates/client-app
-          tagName: v__VERSION__
-          releaseName: 'Inactive v__VERSION__'
-          releaseBody: 'See the release notes for full details.'
+          args: ${{ matrix.args }}
+          tagName: ${{ github.ref_name }}
+          releaseName: 'Inactive ${{ github.ref_name }}'
+          releaseBody: 'Inactive Remote Desktop Release ${{ github.ref_name }}'
           releaseDraft: false
           prerelease: false
 
+      - name: Upload Host Agent (macOS)
+        if: matrix.platform == 'macos-latest'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload ${{ github.ref_name }} target/release/inactive-agent#inactive-agent-macos-arm64 --clobber || true
+
+      - name: Upload Host Agent (Windows)
+        if: matrix.platform == 'windows-latest'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload ${{ github.ref_name }} target/release/inactive-agent.exe#inactive-agent-windows-x64.exe --clobber || true

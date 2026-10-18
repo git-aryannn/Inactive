@@ -2,11 +2,8 @@
 // Tauri commands exposed to the React frontend
 
 use anyhow::Result;
-use remote_desktop_core::protocol::{MessageType, MouseButton};
 use serde::{Deserialize, Serialize};
-use std::sync::Arc;
-use tauri::State;
-use tokio::sync::Mutex;
+use tauri::Emitter;
 
 /// Connection state shared across commands
 pub struct ConnectionState {
@@ -61,11 +58,11 @@ pub async fn disconnect() -> Result<(), String> {
 /// Send mouse movement event to host
 #[tauri::command]
 pub async fn send_mouse_event(
-    x: f64,
-    y: f64,
-    button: Option<String>,
-    pressed: Option<bool>,
-    scroll_delta: Option<f64>,
+    _x: f64,
+    _y: f64,
+    _button: Option<String>,
+    _pressed: Option<bool>,
+    _scroll_delta: Option<f64>,
 ) -> Result<(), String> {
     // TODO: Serialize event, encrypt, send over QUIC control stream
     Ok(())
@@ -73,7 +70,7 @@ pub async fn send_mouse_event(
 
 /// Send keyboard event to host
 #[tauri::command]
-pub async fn send_key_event(key_code: u32, pressed: bool) -> Result<(), String> {
+pub async fn send_key_event(_key_code: u32, _pressed: bool) -> Result<(), String> {
     // TODO: Serialize event, encrypt, send over QUIC control stream
     Ok(())
 }
