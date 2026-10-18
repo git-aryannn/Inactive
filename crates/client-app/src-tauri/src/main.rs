@@ -3,7 +3,6 @@
 
 mod commands;
 
-use tauri::Manager;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 #[tokio::main]
