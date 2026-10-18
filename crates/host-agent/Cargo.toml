@@ -30,12 +30,7 @@ url = "2"
 config = { workspace = true }
 dirs = "5"
 
-[target.'cfg(target_os = "windows")'.dependencies]
-# Windows Service support
-windows-service = "0.7"
-
 [target.'cfg(target_os = "macos")'.dependencies]
-# macOS doesn't need extra deps — we use launchd via plist
-# But we use libc for process utilities
+# macOS process utilities
 libc = "0.2"
 

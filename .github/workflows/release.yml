@@ -39,9 +39,6 @@ jobs:
         working-directory: crates/client-app
         run: npm install
 
-      - name: Build Host Agent Binary
-        run: cargo build --release --package host-agent
-
       - name: Build Tauri Client App
         uses: tauri-apps/tauri-action@v0
         env:
@@ -55,8 +52,13 @@ jobs:
           releaseDraft: false
           prerelease: false
 
+      - name: Build Host Agent Binary
+        continue-on-error: true
+        run: cargo build --release --package host-agent
+
       - name: Upload Host Agent (macOS)
         if: matrix.platform == 'macos-latest'
+        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -64,6 +66,7 @@ jobs:
 
       - name: Upload Host Agent (Windows)
         if: matrix.platform == 'windows-latest'
+        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |

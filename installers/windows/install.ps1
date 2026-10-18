@@ -42,7 +42,7 @@ if (Get-Service -Name $ServiceName -ErrorAction SilentlyContinue) {
 # 4. Create Windows Service
 Write-Host "4. Creating Windows Service (SYSTEM account)..."
 New-Service -Name $ServiceName `
-    -BinaryPathName "`"$BinaryPath`" --service" `
+    -BinaryPathName "`"$BinaryPath`"" `
     -DisplayName $DisplayName `
     -Description $Description `
     -StartupType Automatic
