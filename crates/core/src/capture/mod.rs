@@ -1,16 +1,13 @@
 // crates/core/src/capture/mod.rs
-// Cross-platform screen capture abstraction using scap (DXGI on Windows, ScreenCaptureKit on macOS)
+// Cross-platform screen capture abstraction using xcap (Windows, macOS, Linux)
 
 use anyhow::Result;
 use std::time::{SystemTime, UNIX_EPOCH};
-use scap::{
-    capturer::{Capturer, Options, Resolution},
-    frame::{Frame as ScapFrame, FrameType, VideoFrame},
-};
+use xcap::Monitor;
 
-/// Raw BGRA frame from screen capture
+/// Raw frame from screen capture
 pub struct Frame {
-    /// Raw BGRA pixel data
+    /// Raw pixel data
     pub data: Vec<u8>,
     pub width: u32,
     pub height: u32,
@@ -26,60 +23,37 @@ pub trait ScreenCapture: Send {
 }
 
 pub struct PlatformCapture {
-    capturer: Capturer,
+    monitor: Monitor,
     width: u32,
     height: u32,
 }
 
 impl PlatformCapture {
     pub fn new() -> Result<Self> {
-        #[cfg(target_os = "macos")]
-        {
-            if !scap::has_permission() {
-                scap::request_permission();
-                if !scap::has_permission() {
-                    anyhow::bail!(
-                        "Screen Recording permission denied. \
-                         Please enable in System Settings → Privacy & Security → Screen Recording"
-                    );
-                }
-            }
-        }
+        let monitors = Monitor::all().map_err(|e| anyhow::anyhow!("Failed to list monitors: {:?}", e))?;
+        let monitor = monitors
+            .into_iter()
+            .find(|m| m.is_primary().unwrap_or(false))
+            .or_else(|| Monitor::all().ok()?.into_iter().next())
+            .ok_or_else(|| anyhow::anyhow!("No monitors found"))?;
 
-        let options = Options {
-            fps: 60,
-            output_resolution: Resolution::Captured,
-            show_cursor: true,
-            show_highlight: false,
-            output_type: FrameType::BGRAFrame,
-            ..Default::default()
-        };
+        let width = monitor.width().map_err(|e| anyhow::anyhow!("{:?}", e))?;
+        let height = monitor.height().map_err(|e| anyhow::anyhow!("{:?}", e))?;
 
-        let mut capturer = Capturer::build(options)
-            .map_err(|e| anyhow::anyhow!("Failed to build capturer: {:?}", e))?;
-        capturer.start_capture();
-
-        // Get actual dimensions from first frame
-        let first_frame = capturer.get_next_frame()
-            .map_err(|e| anyhow::anyhow!("Failed to get first frame: {:?}", e))?;
-        let (width, height) = match &first_frame {
-            ScapFrame::Video(VideoFrame::BGRA(f)) => (f.width as u32, f.height as u32),
-            _ => anyhow::bail!("Unexpected frame format"),
-        };
-
-        Ok(Self { capturer, width, height })
+        Ok(Self {
+            monitor,
+            width,
+            height,
+        })
     }
 }
 
 impl ScreenCapture for PlatformCapture {
     fn capture(&mut self) -> Result<Frame> {
-        let frame = self.capturer.get_next_frame()
-            .map_err(|e| anyhow::anyhow!("Capture error: {:?}", e))?;
-
-        let data = match frame {
-            ScapFrame::Video(VideoFrame::BGRA(f)) => f.data,
-            _ => anyhow::bail!("Expected BGRA video frame"),
-        };
+        let image = self.monitor.capture_image().map_err(|e| anyhow::anyhow!("Capture error: {:?}", e))?;
+        let width = image.width();
+        let height = image.height();
+        let data = image.into_raw();
 
         let timestamp_ms = SystemTime::now()
             .duration_since(UNIX_EPOCH)
@@ -88,8 +62,8 @@ impl ScreenCapture for PlatformCapture {
 
         Ok(Frame {
             data,
-            width: self.width,
-            height: self.height,
+            width,
+            height,
             timestamp_ms,
         })
     }

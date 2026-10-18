@@ -28,8 +28,8 @@ bincode = { workspace = true }
 bytes = "1"
 futures = "0.3"
 
-# Cross-platform screen capture (DXGI on Windows, ScreenCaptureKit on macOS)
-scap = "0.1.0-beta.1"
+# Cross-platform screen capture (Windows, macOS, Linux)
+xcap = "0.9"
 
 # Cross-platform input simulation
 enigo = { version = "0.2", features = [] }
